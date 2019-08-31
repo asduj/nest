@@ -30,12 +30,10 @@ class GroupingPresenter(ABC):  # pragma: no cover
     def limited_keys_number(self, data: dict, keys: Tuple[str, ...]) -> Any:
         message = (
             'Dictionary (object) should at least contains on 1 key more '
-            'then level of nesting.'
+            'then level of nesting. Nesting level is {0}, number of keys is {1}'
         )
-        message += 'Nesting level is {}, number of keys is {}'.format(
-            len(keys), len(data.keys())
-        )
-        return message
+
+        return message.format(len(keys), len(data.keys()))
 
     @abstractmethod
     def composite_value_is_forbidden(self, data: Any) -> Any:
