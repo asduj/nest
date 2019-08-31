@@ -1,4 +1,4 @@
-from typing import List, Any, Tuple, NoReturn
+from typing import List, Any, Tuple
 
 from fastapi import FastAPI, Query, Depends, HTTPException
 from fastapi.security import HTTPBasicCredentials, HTTPBasic
@@ -10,25 +10,9 @@ from starlette.status import (
     HTTP_422_UNPROCESSABLE_ENTITY,
 )
 
-from nest import (
-    SanitisePresenter,
-    GroupingUseCase, GroupingPresenter,
-
-)
+from nest import GroupingUseCase, GroupingPresenter
 
 app = FastAPI()
-
-
-class SanitiseJSONPresenter(SanitisePresenter):
-    def invalid_json(self, details=None) -> NoReturn:
-        raise NotImplementedError
-
-    def wrong_format(self, details=None) -> JSONResponse:
-        error = details or super().wrong_format()
-        return JSONResponse(
-            content={'error': error},
-            status_code=HTTP_400_BAD_REQUEST,
-        )
 
 
 class GroupingJSONPresenter(GroupingPresenter):  # pragma: no cover
@@ -81,8 +65,6 @@ def nest(
         items: List[dict],
         keys: List[str] = Query(None),
 ):
-    presenter = SanitiseJSONPresenter()
-
     if not keys:
         raise HTTPException(
             status_code=HTTP_422_UNPROCESSABLE_ENTITY,
@@ -92,9 +74,6 @@ def nest(
                 'type': 'value_error.missing'
             }
         )
-
-    elif not isinstance(items, list):
-        return presenter.wrong_format()
 
     return GroupingUseCase(
         presenter=GroupingJSONPresenter(),
