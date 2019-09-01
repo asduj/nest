@@ -28,13 +28,9 @@ class GroupingJSONPresenter(GroupingPresenter):  # pragma: no cover
             status_code=HTTP_400_BAD_REQUEST,
         )
 
-    def limited_keys_number(
-            self,
-            data: dict,
-            keys: Tuple[str, ...],
-    ) -> JSONResponse:
+    def limited_keys_number(self, keys: Tuple[str, ...]) -> JSONResponse:
         return JSONResponse(
-            content=super().limited_keys_number(data, keys),
+            content=super().limited_keys_number(keys),
             status_code=HTTP_400_BAD_REQUEST,
         )
 
@@ -66,6 +62,8 @@ def nest(
         keys: List[str] = Query(None),
 ):
     if not keys:
+        # Hack to make an error similar built-in validation error
+        # Because Query(None) make `keys` optional
         raise HTTPException(
             status_code=HTTP_422_UNPROCESSABLE_ENTITY,
             detail={
